@@ -31,6 +31,15 @@ export class BillService {
     }
   }
 
+  async addTotal(id:number, inc:number){
+  try{
+      const bill = await this.billModel.updateOne({id:id},{$inc:{total:inc}});
+      return bill.acknowledged;
+    } catch (error){
+      throw new Error("Could not update this post");
+    }
+  }
+
   async remove(id: number) {
     try{
       const bill = await this.billModel.deleteOne({id:id});

@@ -8,5 +8,6 @@ import { Bill, BillSchema } from './schema/bill.schema';
   imports: [MongooseModule.forFeature([{ name: Bill.name, schema: BillSchema }])],
   controllers: [BillController],
   providers: [BillService],
+  exports:[BillService]
 })
 export class BillModule {}

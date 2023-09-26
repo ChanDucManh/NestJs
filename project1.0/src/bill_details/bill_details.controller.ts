@@ -1,25 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ConsoleLogger } from '@nestjs/common';
 import { BillDetailsService } from './bill_details.service';
 import { CreateBillDetailDto } from './dto/create-bill_detail.dto';
 import { UpdateBillDetailDto } from './dto/update-bill_detail.dto';
+import { ProductsService } from 'src/products/products.service';
+import { BillService } from 'src/bill/bill.service';
 
-@Controller('bill-details')
+@Controller('bill/bill-details')
 export class BillDetailsController {
-  constructor(private readonly billDetailsService: BillDetailsService) {}
+  constructor(
+    private readonly billDetailsService: BillDetailsService,
+    private productService:ProductsService,
+    private billService:BillService
+    ) {}
 
   @Post()
-  create(@Body() createBillDetailDto: CreateBillDetailDto) {
-    return this.billDetailsService.create(createBillDetailDto);
+  async create(@Body() createBillDetailDto: CreateBillDetailDto) {
+    var productId = createBillDetailDto["product_id"];
+    var billId = createBillDetailDto["bill_id"];
+    var priceJson = await this.productService.getPriceProduct(productId);
+    var price = priceJson["price"];
+    const [add,result] = await Promise.all([
+    this.billService.addTotal(billId,price),
+    this.billDetailsService.create(createBillDetailDto),
+    ]);
+    return result;
   }
 
-  @Get()
-  findAll() {
-    return this.billDetailsService.findAll();
+  @Get('/:bill_id')
+  findAll(@Param('bill_id') bill_id: number) {
+    return this.billDetailsService.findAll(bill_id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.billDetailsService.findOne(id);
+  @Get('/:bill_id/:id')
+  findOne(@Param('bill_id') bill_id: number, @Param('id') id: number) {
+    return this.billDetailsService.findOne(bill_id, id);
   }
 
   @Patch(':id')

@@ -39,4 +39,8 @@ export class ProductsService {
       throw new Error("Could not update this post");
     }
   }
+
+  getPriceProduct(id:number):Promise<Product|null>{
+    return this.productModel.findOne({id},{_id:0,price:1}).exec();
+  }
 }

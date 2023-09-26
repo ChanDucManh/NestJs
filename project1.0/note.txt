@@ -1,1 +1,2 @@
-16/9 Created resource users
+Created resource users
+Update total bill when create new bill-detail
